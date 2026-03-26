@@ -9,36 +9,38 @@ load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
+
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# Memory (shared for now - simple version)
-messages = [
-    {
-        "role": "system",
-        "content": "You are a chatbot for a Reikigyan website reikigyan.in. Answer about courses, benefits, pricing, and contact details in short."
-    }
-]
+# Strong system prompt (prevents wrong answers)
+SYSTEM_PROMPT = """
+You are a chatbot for the website reikigyan.in.
 
-# Chat function (clean)
+Rules:
+- Answer ONLY about Reiki courses, benefits, pricing, and general info
+- Do NOT make up phone numbers, email, or address
+- If user asks contact details, say: "Please visit the official website reikigyan.in"
+- If you don't know something, say: "Please check the official website"
+- Keep answers short and clear
+"""
+
+# Chat function (no shared memory)
 
 
 def chat(user_message):
-    messages.append({"role": "user", "content": user_message})
-
     response = client.chat.completions.create(
         model="gpt-4.1-mini",
-        messages=messages,
-        max_tokens=100
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": user_message}
+        ],
+        max_tokens=120
     )
 
-    reply = response.choices[0].message.content
-    messages.append({"role": "assistant", "content": reply})
-
-    return reply
-
-# API endpoint
+    return response.choices[0].message.content
 
 
+# Chat API
 @app.route("/chat", methods=["POST"])
 def chatbot():
     data = request.get_json()
@@ -54,7 +56,12 @@ def chatbot():
         return jsonify({"error": str(e)}), 500
 
 
-# Run server
+# Home route (for uptime check)
+@app.route("/", methods=["GET"])
+def home():
+    return "Chatbot is running"
+
+
+# Run server (Replit / hosting ready)
 if __name__ == "__main__":
-    #    app.run(debug=True)  # default code
-    app.run(host="0.0.0.0", port=5000)  # changed for render
+    app.run(host="0.0.0.0", port=5000)
