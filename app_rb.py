@@ -15,24 +15,7 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 messages = [
     {
         "role": "system",
-        "content": """You are a chatbot for a Reikigyan website reikigyan.in. Answer about courses, benefits, pricing, and contact details in short.
-        IMPORTANT INFORMATION:
-        - Website: https://www.reikigyan.in
-        - Contact Number: +91-8800331822
-        - Email: jyotishduniya7@gmail.com
-
-        COURSES:
-        - Reiki Level 1
-        - Reiki Level 2
-        - Reiki Master Level
-        - Healing Services
-        - Various Pain removals
-
-        RULES:
-        - Only answer based on above info
-        - If you don't know, say: "Please contact us directly"
-        - Do NOT make up phone numbers or details
-        """
+        "content": "You are a chatbot for a Reikigyan website reikigyan.in. Answer about courses, benefits, pricing, and contact details in short."
     }
 ]
 
@@ -73,5 +56,5 @@ def chatbot():
 
 # Run server
 if __name__ == "__main__":
-    # app.run(debug=True)   #default code
+    #    app.run(debug=True)  # default code
     app.run(host="0.0.0.0", port=5000)  # changed for render
